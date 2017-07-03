@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Contains rules_role_email.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function rules_role_email_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the rules_role_email module.
+    case 'help.page.rules_role_email':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('This module provides a Rules action that sends emails to users of specified roles.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
