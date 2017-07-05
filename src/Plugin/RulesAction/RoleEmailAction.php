@@ -103,6 +103,7 @@ class RoleEmailAction extends RulesActionBase {
   protected function retrieveUsersOfRoles(array $roles) {
     $uids = Drupal::entityQuery('user')
       ->condition('roles', $roles, 'IN')
+      ->condition('status', 1)
       ->execute();
 
     return User::loadMultiple($uids);
