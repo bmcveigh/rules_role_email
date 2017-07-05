@@ -39,7 +39,7 @@ function rules_role_email_form_rules_expression_edit_alter(&$form, FormStateInte
 
   if ($reaction_config instanceof ReactionRuleConfig) {
     $rules_action_config = $reaction_config->getExpression()->getConfiguration();
-    $rules_action_id = $rules_action_config['actions']['actions'][0]['action_id'];
+    $rules_action_id = isset($rules_action_config['actions']['actions'][0]['action_id']) ? $rules_action_config['actions']['actions'][0]['action_id'] : '';
 
     if ($rules_action_id != 'role_email_action') {
       return;
