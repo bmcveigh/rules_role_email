@@ -3,6 +3,7 @@
 namespace Drupal\rules_role_email\Plugin\RulesAction;
 
 use Drupal;
+use Drupal\node\NodeInterface;
 use Drupal\rules\Core\RulesActionBase;
 use Drupal\user\Entity\User;
 
@@ -25,6 +26,12 @@ use Drupal\user\Entity\User;
  *   "message" = @ContextDefinition("string",
  *     label = @Translation("Message"),
  *     description = @Translation("The email's message body."),
+ *   ),
+ *   "node" = @ContextDefinition("entity:node",
+ *     label = @Translation("Node"),
+ *     description = @Translation("Optionally enter in 'node' as a typed data parameter to use tokens."),
+ *     default_value = "node",
+ *     required = false
  *   )
  *  }
  * )
@@ -55,12 +62,20 @@ class RoleEmailAction extends RulesActionBase {
    * Send email to users of specified roles.
    *
    * @param array $roles
-   * @param $subject
-   * @param $message
+   * @param string $subject
+   * @param string $message
+   * @param \Drupal\node\NodeInterface $node
    */
-  protected function doExecute(array $roles, $subject, $message) {
+  protected function doExecute(array $roles, $subject, $message, $node = NULL) {
     $users = $this->retrieveUsersOfRoles($roles);
 
+    // Enable token support if the user has provided a node context.
+    if (isset($node) && $node instanceof NodeInterface) {
+      $message = Drupal::token()->replace($message, ['node' => $node]);
+    }
+
+    // Send out each email individually because certain users may have
+    // different preferred languages such as French or Spanish.
     foreach ($users as $user) {
       if ($user instanceof User) {
         $langcode = $user->getPreferredLangcode();
