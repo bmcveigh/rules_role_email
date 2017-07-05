@@ -95,6 +95,7 @@ class RoleEmailAction extends RulesActionBase {
 
   /**
    * Returns an array of user objects based on the specified roles.
+   * Users that are blocked will NOT receive any email notifications.
    *
    * @param array $roles
    *
