@@ -16,9 +16,27 @@ function rules_role_email_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
     // Main module help for the rules_role_email module.
     case 'help.page.rules_role_email':
+      $steps = [
+        '#theme' => 'item_list',
+        '#list_type' => 'ol',
+        '#items' => [
+          t('From the rules settings page, first add a reaction rule by clicking "Add reaction rule." '),
+          t('Once you have done that click "Edit" to edit your reaction rule.'),
+          t('Click "Add action"'),
+          t('You should now see an "Action" dropdown. In that dropdown, click on "Send an email to all users of a role" in the "User" category and click "Continue"'),
+          t('Enter in the machine name for each role along with the other required fields. For the "Node" field, you will need to click "Switch to data selection" before you save.'),
+          t('Click the "Save" button.'),
+          t('Try triggering that role. All users of the roles you specified should receive an email notification.'),
+        ],
+      ];
+
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
       $output .= '<p>' . t('This module provides a Rules action that sends emails to users of specified roles.') . '</p>';
+      $output .= '<dl>';
+      $output .= '<dt>' . t('How to use') . '</dt>';
+      $output .= '<dd>' . Drupal::service('renderer')->render($steps) . '</dd>';
+      $output .= '</dl>';
       return $output;
 
     default:
