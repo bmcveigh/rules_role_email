@@ -49,8 +49,11 @@ class RoleEmailAction extends RulesActionBase {
    * RoleEmailAction constructor.
    *
    * @param array $configuration
+   *   Configuration Array.
    * @param string $plugin_id
+   *   Plugin ID.
    * @param mixed $plugin_definition
+   *   Mixed Plugin definition.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
@@ -62,11 +65,15 @@ class RoleEmailAction extends RulesActionBase {
    * Send email to users of specified roles.
    *
    * @param array $roles
+   *   Array Roles.
    * @param string $subject
+   *   String Subject.
    * @param string $message
+   *   String message.
    * @param \Drupal\node\NodeInterface $node
+   *   Node {@inheritdoc}.
    */
-  protected function doExecute(array $roles, $subject, $message, $node = NULL) {
+  protected function doExecute(array $roles, $subject, $message, NodeInterface $node = NULL) {
     $users = $this->retrieveUsersOfRoles($roles);
 
     // Enable token support if the user has provided a node context.
@@ -95,11 +102,14 @@ class RoleEmailAction extends RulesActionBase {
 
   /**
    * Returns an array of user objects based on the specified roles.
+   *
    * Users that are blocked will NOT receive any email notifications.
    *
    * @param array $roles
+   *   Array Roles.
    *
    * @return \Drupal\Core\Entity\EntityInterface[]|static[]
+   *   Return static.
    */
   protected function retrieveUsersOfRoles(array $roles) {
     $uids = Drupal::entityQuery('user')

@@ -1,7 +1,7 @@
 # Rules Role Email for Drupal 8
 
-The Rules Role Email module provides an action to the rules module that sends emails to specified roles that
-an admin chooses.
+The Rules Role Email module provides an action to the rules module that sends
+emails to specified roles that an admin chooses.
 
 * Project homepage: https://www.drupal.org/project/rules_role_email
 
@@ -22,7 +22,8 @@ your local Drupal installation for SIMPLETEST_BASE_URL.
 
 Example for executing one single test file during development:
 
-    ../vendor/bin/phpunit ../modules/rules/tests/src/Integration/Action/DataSetTest.php
+    ../vendor/bin/phpunit ..
+    /modules/rules/tests/src/Integration/Action/DataSetTest.php
 
 You can also execute the test cases from the web interface at
 ``/admin/config/development/testing``.

@@ -47,10 +47,10 @@ function rules_role_email_form_rules_expression_edit_alter(&$form, FormStateInte
   }
 
   if (isset($form['context']['message'])) {
-    $form['context']['message']['token_help'] = array(
+    $form['context']['message']['token_help'] = [
       '#title' => t('Replacement patterns'),
       '#type' => 'fieldset',
-    );
+    ];
     $form['context']['message']['token_help']['tokens'] = [
       '#theme' => 'token_tree_link',
       '#token_types' => ['node'],
