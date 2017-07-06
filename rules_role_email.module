@@ -20,7 +20,7 @@ function rules_role_email_help($route_name, RouteMatchInterface $route_match) {
         '#theme' => 'item_list',
         '#list_type' => 'ol',
         '#items' => [
-          t('From the rules settings page, first add a reaction rule by clicking "Add reaction rule." '),
+          t('From the rules settings page, first add a reaction rule by clicking "Add reaction rule."'),
           t('Once you have done that click "Edit" to edit your reaction rule.'),
           t('Click "Add action"'),
           t('You should now see an "Action" dropdown. In that dropdown, click on "Send an email to all users of a role" in the "User" category and click "Continue"'),
