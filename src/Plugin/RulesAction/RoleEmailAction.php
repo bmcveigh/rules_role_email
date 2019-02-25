@@ -2,10 +2,14 @@
 
 namespace Drupal\rules_role_email\Plugin\RulesAction;
 
-use Drupal;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\node\NodeInterface;
 use Drupal\rules\Core\RulesActionBase;
+use Drupal\user\UserStorageInterface;
 use Drupal\user\Entity\User;
+use Drupal\Core\Mail\MailManagerInterface;
+use Drupal\Core\Utility\Token;
 
 /**
  * Provides a 'RoleEmailAction' action.
@@ -36,7 +40,7 @@ use Drupal\user\Entity\User;
  *  }
  * )
  */
-class RoleEmailAction extends RulesActionBase {
+class RoleEmailAction extends RulesActionBase implements ContainerFactoryPluginInterface {
 
   /**
    * Mail manager object so we can send emails.
@@ -46,19 +50,54 @@ class RoleEmailAction extends RulesActionBase {
   protected $mailManager;
 
   /**
-   * RoleEmailAction constructor.
+   * User storage handler.
+   *
+   * @var \Drupal\user\UserStorageInterface
+   */
+  protected $userStorage;
+
+  /**
+   * The token service.
+   *
+   * @var \Drupal\Core\Utility\Token
+   */
+  protected $token;
+
+  /**
+   * Constructs an EntityCreate object.
    *
    * @param array $configuration
-   *   Configuration Array.
+   *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   Plugin ID.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
-   *   Mixed Plugin definition.
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
+   *   The mail manager service.
+   * @param \Drupal\user\UserStorageInterface $user_storage
+   *   The user storage handler.
+   * @param \Drupal\Core\Utility\Token $token
+   *   The token service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, MailManagerInterface $mail_manager, UserStorageInterface $user_storage, Token $token) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->mailManager = $mail_manager;
+    $this->userStorage = $user_storage;
+    $this->token = $token;
+  }
 
-    $this->mailManager = Drupal::service('plugin.manager.mail');
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('plugin.manager.mail'),
+      $container->get('entity.manager')->getStorage('user'),
+      $container->get('token')
+    );
   }
 
   /**
@@ -70,15 +109,15 @@ class RoleEmailAction extends RulesActionBase {
    *   String Subject.
    * @param string $message
    *   String message.
-   * @param \Drupal\node\NodeInterface $node
+   * @param \Drupal\node\NodeInterface|string $node
    *   Node {@inheritdoc}.
    */
-  protected function doExecute(array $roles, $subject, $message, NodeInterface $node = NULL) {
+  protected function doExecute(array $roles, $subject, $message, $node = NULL) {
     $users = $this->retrieveUsersOfRoles($roles);
 
     // Enable token support if the user has provided a node context.
     if (isset($node) && $node instanceof NodeInterface) {
-      $message = Drupal::token()->replace($message, ['node' => $node]);
+      $message = $this->token->replace($message, ['node' => $node]);
     }
 
     // Send out each email individually because certain users may have
@@ -108,16 +147,16 @@ class RoleEmailAction extends RulesActionBase {
    * @param array $roles
    *   Array Roles.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]|static[]
-   *   Return static.
+   * @return \Drupal\Core\Entity\EntityInterface[]
+   *   An array of user entity objects indexed by their IDs.
    */
   protected function retrieveUsersOfRoles(array $roles) {
-    $uids = Drupal::entityQuery('user')
+    $uids = $this->userStorage->getQuery()
       ->condition('roles', $roles, 'IN')
       ->condition('status', 1)
       ->execute();
 
-    return User::loadMultiple($uids);
+    return $this->userStorage->loadMultiple($uids);
   }
 
 }
