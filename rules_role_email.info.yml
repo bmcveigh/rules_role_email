@@ -4,4 +4,4 @@ description: This module provides a Rules action that sends emails to users of s
 core: 8.x
 package: Rules
 dependencies:
-  - rules
+  - drupal:rules
