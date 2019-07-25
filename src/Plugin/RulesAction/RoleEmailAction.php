@@ -111,7 +111,7 @@ class RoleEmailAction extends RulesActionBase implements ContainerFactoryPluginI
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to be used for tokens.
    */
-  protected function doExecute(array $roles, $subject, $message, EntityInterface $entity = NULL) {
+  protected function doExecute(array $roles, $subject, $message, $entity = NULL) {
     $users = $this->retrieveUsersOfRoles($roles);
 
     // Enable token support if the user has provided an entity context.
@@ -135,9 +135,10 @@ class RoleEmailAction extends RulesActionBase implements ContainerFactoryPluginI
         // Set a unique key for this mail.
         $key = 'rules_action_mail_' . $this->getPluginId();
 
-        $mail = $user->get('mail')->getValue();
-        $to = $mail[0]['value'];
-        $this->mailManager->mail('rules', $key, $to, $langcode, $params, TRUE);
+        $to = $user->get('mail')->getString();
+        if (!empty($to)) {
+          $this->mailManager->mail('rules', $key, $to, $langcode, $params, TRUE);
+        }
       }
     }
   }
