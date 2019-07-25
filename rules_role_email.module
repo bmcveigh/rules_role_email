@@ -63,7 +63,7 @@ function rules_role_email_form_rules_expression_edit_alter(&$form, FormStateInte
       return;
     }
   }
-  
+
   $form['context']['message']['setting']['#type'] = 'textarea';
 
   if (isset($form['context']['entity']['setting']['#default_value'])) {

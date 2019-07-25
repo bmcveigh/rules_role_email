@@ -4,7 +4,6 @@ namespace Drupal\rules_role_email\Plugin\RulesAction;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\node\NodeInterface;
 use Drupal\rules\Core\RulesActionBase;
 use Drupal\user\UserStorageInterface;
 use Drupal\user\Entity\User;
@@ -112,7 +111,7 @@ class RoleEmailAction extends RulesActionBase implements ContainerFactoryPluginI
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to be used for tokens.
    */
-  protected function doExecute(array $roles, $subject, $message, $entity = null) {
+  protected function doExecute(array $roles, $subject, $message, $entity = NULL) {
     $users = $this->retrieveUsersOfRoles($roles);
 
     // Enable token support if the user has provided an entity context.
