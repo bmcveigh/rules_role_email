@@ -10,6 +10,7 @@ use Drupal\user\UserStorageInterface;
 use Drupal\user\Entity\User;
 use Drupal\Core\Mail\MailManagerInterface;
 use Drupal\Core\Utility\Token;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Provides a 'RoleEmailAction' action.
@@ -27,16 +28,15 @@ use Drupal\Core\Utility\Token;
  *      label = @Translation("Subject"),
  *      description = @Translation("The email's subject."),
  *    ),
- *   "message" = @ContextDefinition("string",
- *     label = @Translation("Message"),
- *     description = @Translation("The email's message body."),
- *   ),
- *   "node" = @ContextDefinition("entity:node",
- *     label = @Translation("Node"),
- *     description = @Translation("Optionally enter in 'node' as a typed data parameter to use tokens."),
- *     default_value = "node",
- *     required = false
- *   )
+ *    "message" = @ContextDefinition("string",
+ *      label = @Translation("Message"),
+ *      description = @Translation("The email's message body."),
+ *    ),
+ *    "entity" = @ContextDefinition("entity",
+ *      label = @Translation("Entity"),
+ *      description = @Translation("Specifies the entity, which should be used for tokens."),
+ *      required = false
+ *    )
  *  }
  * )
  */
@@ -109,15 +109,19 @@ class RoleEmailAction extends RulesActionBase implements ContainerFactoryPluginI
    *   String Subject.
    * @param string $message
    *   String message.
-   * @param \Drupal\node\NodeInterface|string $node
-   *   Node {@inheritdoc}.
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to be used for tokens.
    */
-  protected function doExecute(array $roles, $subject, $message, $node = NULL) {
+  protected function doExecute(array $roles, $subject, $message, $entity = null) {
     $users = $this->retrieveUsersOfRoles($roles);
 
-    // Enable token support if the user has provided a node context.
-    if (isset($node) && $node instanceof NodeInterface) {
-      $message = $this->token->replace($message, ['node' => $node]);
+    // Enable token support if the user has provided an entity context.
+    if (isset($entity) && $entity instanceof EntityInterface) {
+      $entity_type_id = $entity->getEntityTypeId();
+      if ($this->token->getTypeInfo($entity_type_id)) {
+        $subject = $this->token->replace($subject, [$entity_type_id => $entity]);
+        $message = $this->token->replace($message, [$entity_type_id => $entity]);
+      }
     }
 
     // Send out each email individually because certain users may have
